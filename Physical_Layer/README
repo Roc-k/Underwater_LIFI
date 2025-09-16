@@ -1,0 +1,6 @@
+
+1. Install platformio for vscode
+
+Creating new project:
+2. Select doit esp32 dev kit
+3. framework select espdif
