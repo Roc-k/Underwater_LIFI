@@ -1,36 +1,19 @@
-#include <stdio.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <driver/gpio.h>
-#include "sdkconfig.h"
-
-#define HIGH 1
-#define LOW 0
-
-#define LED_PIN_1 39
-#define BUTTON_PIN_1 45
+#include "main.h"
 
 void app_main(void)
 {
-    gpio_config_t io_led = {
-        .pin_bit_mask = (1ULL << LED_PIN_1),
-        .mode = GPIO_MODE_OUTPUT,              // Set as output
-        .pull_up_en = GPIO_PULLUP_DISABLE,     // Disable pull-up
-        .pull_down_en = GPIO_PULLDOWN_DISABLE, // Disable pull-down
-        .intr_type = GPIO_INTR_DISABLE         // Disable interrupts
-    };
     gpio_config(&io_led);
-
-    gpio_config_t io_button = {
-        .pin_bit_mask = (1ULL << BUTTON_PIN_1),
-        .mode = GPIO_MODE_INPUT,               // Set as input
-        .pull_up_en = GPIO_PULLUP_DISABLE,     // Disable pull-up
-        .pull_down_en = GPIO_PULLDOWN_DISABLE, // Disable pull-down
-        .intr_type = GPIO_INTR_DISABLE         // Disable interrupts
-    };
     gpio_config(&io_button);
+    esp_task_wdt_init(&twdt_config); // only init in main thread
 
+    esp_task_wdt_add(NULL);
+
+    int lastButtonState = LOW;
     while (1) {
+
+        // pet watchdog
+        esp_task_wdt_reset();
+
         // Turn all LEDs ON
         int buttonState = gpio_get_level(BUTTON_PIN_1);
 
@@ -39,5 +22,10 @@ void app_main(void)
         } else {
             gpio_set_level(LED_PIN_1, LOW);
         }
+        if (buttonState != lastButtonState) {
+            printf("%d\n", buttonState);
+            lastButtonState = buttonState;
+        }
+        vTaskDelay(pdMS_TO_TICKS(100)); // let other tasks run
 };
 }
