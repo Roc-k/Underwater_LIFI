@@ -29,7 +29,7 @@ void app_main(void)
 
     esp_task_wdt_add(NULL);
 
-    int lastButtonState = LOW;
+
     sync_loop();
     main_loop();
 }
@@ -40,6 +40,7 @@ void sync_loop(void){
         int button2 = gpio_get_level(BUTTON_PIN_2);
 
         if(button1 == HIGH){
+            gpio_set_level(LED_PIN_2, HIGH);
             sync_transmitter();
             return;
         }
@@ -102,6 +103,7 @@ void sync_transmitter(void){
     start_sync();
     do {
         transmit(TRANSMISSIONSIG);
+        gpio_set_level(LED_PIN_2, LOW);
     } while(gpio_get_level(SIGNAL_INPUT_1) == LOW);
 }
 
