@@ -31,7 +31,10 @@ void app_main(void)
 
 
     sync_loop();
-    main_loop();
+    gpio_set_level(LED_PIN_2, LOW);
+    gpio_set_level(LED_PIN_1, LOW);
+
+    // main_loop();
 }
 
 void sync_loop(void){
@@ -96,6 +99,7 @@ void start_sync(void){
 
     while(inputState == HIGH) {
         //pause while they also turn off
+        inputState = gpio_get_level(SIGNAL_INPUT_1);
     }
 }
 

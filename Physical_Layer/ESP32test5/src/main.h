@@ -10,7 +10,7 @@
 
 #define HIGH 1
 #define LOW 0
-#define CLOCKTIME 1
+#define CLOCKTIME 0.0001
 
 #define TRANSMISSIONSIG 185
 
