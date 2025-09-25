@@ -1,5 +1,22 @@
 #include "main.h"
 
+void sync_loop(void);
+void main_loop(void);
+void execute(int executable);
+void toggle(void);
+void start_sync(void);
+void sync_transmitter(void);   
+int readBetter();
+void sync_find(void);
+void transmit(int signal);
+void transmit_message(int signal);
+int receieve(void);
+void writeBetter(int output);
+void send(int singal);
+void sync_receiver(void);
+
+
+
 void app_main(void)
 {
     gpio_config(&io_led);
@@ -37,7 +54,7 @@ void sync_loop(void){
 
 void main_loop(void) {
     while(1) {
-        int command = read();
+        int command = readBetter();
         if(command == TRANSMISSIONSIG){
             int executable = receieve();
             execute(executable);
@@ -60,21 +77,21 @@ void execute(int executable) {
 void toggle(){
     int led_state = gpio_get_level(LED_PIN_2);
     if(led_state == HIGH) {
-        write(LOW);
+        writeBetter(LOW);
     } else {
-        write(HIGH);
+        writeBetter(HIGH);
     }
 }
 
 void start_sync(void){
-    write(HIGH);
+    writeBetter(HIGH);
     int inputState;
     do {
         inputState = gpio_get_level(SIGNAL_INPUT_1);
     } while (inputState == LOW);
 
     //we've read a signal, time to turn off
-    write(LOW);
+    writeBetter(LOW);
 
     while(inputState == HIGH) {
         //pause while they also turn off
@@ -88,7 +105,7 @@ void sync_transmitter(void){
     } while(gpio_get_level(SIGNAL_INPUT_1) == LOW);
 }
 
-int read(void) {
+int readBetter() {
     int read = 0;
     int read_bits = 8;
     while(read_bits > 0) {
@@ -97,12 +114,11 @@ int read(void) {
         read += small_read << read_bits;
         sleep(CLOCKTIME);
     }
-
+    return read;
 }
 
 void sync_find(void) {
     // syncs such that terminates just after TRANSMISSIONSIG is read
-    int reading;
     //wait for one high and low to beging searching(mini sync)
     
     while(gpio_get_level(SIGNAL_INPUT_1) == HIGH){
@@ -113,11 +129,11 @@ void sync_find(void) {
     }
 
     int reading;
-    reading = read();
+    reading = readBetter();
     while(reading != TRANSMISSIONSIG) {
         //offset by 1 cycle, this can be made smarter later
         sleep(CLOCKTIME);
-        reading = read();
+        reading = readBetter();
     }
 
 }
@@ -126,7 +142,7 @@ void transmit(int signal) {
     int send_ints = 8;
     while(send_ints > 0) {
         send(signal & 1);
-        signal >> 1;
+        signal >>= 1;
         send_ints -= 1;
     }
 }
@@ -137,25 +153,25 @@ void transmit_message(int signal){
     }
     while(signal > 0){
         transmit(signal);
-        signal >> 8;
+        signal >>= 8;
     }
     transmit(TRANSMISSIONSIG);
 }
 
-int receieve(){
+int receieve(void){
 
-    int start = read();
+    int start = readBetter();
     if (start != TRANSMISSIONSIG) {
         sync_find();
     }
     //tell them we're ready
-    write(HIGH);
+    writeBetter(HIGH);
 
     int message = 0;
     int message_length = 0;
     int current;
     do {
-        current = read();
+        current = readBetter();
         if(current == TRANSMISSIONSIG && message_length == 0){
             current = 0;
         }
@@ -163,24 +179,24 @@ int receieve(){
         message_length += 1;
 
     } while(current != TRANSMISSIONSIG);
-
+    return message;
 }
 
-void write(int output){
-    digitalWrite(SIGNAL_OUTPUT_1, output);
-    digitalWrite(LED_PIN_1, output);
+void writeBetter(int output){
+    gpio_set_level(SIGNAL_OUTPUT_1, output);
+    gpio_set_level(LED_PIN_1, output);
 }
 
 void send(int singal) {
-    write(signal);
+    writeBetter(singal);
     sleep(CLOCKTIME);
 }
 
 void sync_receiver(void){
     start_sync();
     sync_find();
-    write(HIGH);
-    sleep(CLOCKTIME * 2);
-    write(LOW);
+    writeBetter(HIGH);
+    readBetter(); //read and discard extra TRANSMISSIONSIG
+    writeBetter(LOW); 
 }
 
