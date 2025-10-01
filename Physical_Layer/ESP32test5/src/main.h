@@ -10,12 +10,13 @@
 
 #define HIGH 1
 #define LOW 0
-#define CLOCKTIME 0.0001
+#define CLOCKTIME 100
 
 #define TRANSMISSIONSIG 185
 
 #define LED_PIN_1 14
 #define LED_PIN_2 13
+#define LED_PIN_3 12
 
 #define BUTTON_PIN_1 16
 #define BUTTON_PIN_2 17
@@ -32,6 +33,14 @@ gpio_config_t io_led = {
 
 gpio_config_t io_led_2 = {
     .pin_bit_mask = (1ULL << LED_PIN_2),
+    .mode = GPIO_MODE_OUTPUT,              
+    .pull_up_en = GPIO_PULLUP_DISABLE,     
+    .pull_down_en = GPIO_PULLDOWN_DISABLE, 
+    .intr_type = GPIO_INTR_DISABLE         // Disable interrupts
+};
+
+gpio_config_t io_led_3 = {
+    .pin_bit_mask = (1ULL << LED_PIN_3),
     .mode = GPIO_MODE_OUTPUT,              
     .pull_up_en = GPIO_PULLUP_DISABLE,     
     .pull_down_en = GPIO_PULLDOWN_DISABLE, 
@@ -72,7 +81,7 @@ gpio_config_t io_button_2 = {
 };
 
 esp_task_wdt_config_t twdt_config = {
-    .timeout_ms = 5000,          
+    .timeout_ms = 50000,          
     .idle_core_mask = (1 << 0),           // Mask for idle tasks (e.g., core 0 only)
     .trigger_panic = true,                // Trigger a panic handler on timeout
 };
