@@ -15,6 +15,7 @@ void writeBetter(int output);
 void send(int singal);
 void sync_receiver(void);
 void toggle_led(void);
+void toggle_led_3(void);
 
 int g_led2 = HIGH; 
 int g_led3 = HIGH; 
