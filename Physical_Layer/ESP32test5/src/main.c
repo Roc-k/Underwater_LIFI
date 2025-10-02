@@ -17,8 +17,8 @@ void sync_receiver(void);
 void toggle_led(void);
 void toggle_led_3(void);
 
-int g_led2 = HIGH; 
-int g_led3 = HIGH; 
+int g_led2 = LOW; 
+int g_led3 = LOW; 
 
 
 
@@ -88,6 +88,9 @@ void main_loop(void) {
 }
 
 void execute(int executable) {
+    printf("executing command");
+    printf("%d", executable);
+    printf("\n");
     switch (executable) {
         case 100:
             toggle_led_3();
@@ -167,7 +170,7 @@ void toggle_led_3(void) {
     } else {
         g_led3 = HIGH;
     }
-
+    printf("setting led3");
     gpio_set_level(LED_PIN_3, g_led3);
 }
 
@@ -210,14 +213,16 @@ void transmit(int signal) {
 }
 
 void transmit_message(int signal){
-    while(gpio_get_level(SIGNAL_INPUT_1) == LOW) {
-        transmit(TRANSMISSIONSIG);
-    }
+    // while(gpio_get_level(SIGNAL_INPUT_1) == LOW) {
+    //     transmit(TRANSMISSIONSIG);
+    // }
     while(signal > 0){
         transmit(signal);
         signal >>= 8;
     }
     transmit(TRANSMISSIONSIG);
+    writeBetter(LOW);
+
 }
 
 int receieve(void){
@@ -226,7 +231,7 @@ int receieve(void){
     // if (start != TRANSMISSIONSIG) {
     //     sync_find();
     // }
-    // //tell them we're ready
+    // // //tell them we're ready
     // writeBetter(HIGH);
 
     int message = 0;
@@ -237,6 +242,9 @@ int receieve(void){
         if(current == TRANSMISSIONSIG && message_length == 0){
             current = 0;
             message_length -= 1;
+        }
+        if(current == TRANSMISSIONSIG) {
+            break;
         }
         message += current << 8 * message_length;
         message_length += 1;
