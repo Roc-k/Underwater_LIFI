@@ -67,7 +67,7 @@ void sync_loop(void){
             return;
         }
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(CLOCKTIME));
 
 
     }
@@ -107,7 +107,7 @@ void start_sync(void){
         inputState = gpio_get_level(SIGNAL_INPUT_1);
         // pet watchdog
         esp_task_wdt_reset();
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(CLOCKTIME));
 
     } while (inputState == LOW);
 
@@ -120,7 +120,7 @@ void start_sync(void){
         // pet watchdog
         esp_task_wdt_reset();
         inputState = gpio_get_level(SIGNAL_INPUT_1);
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(CLOCKTIME));
 
     }
 }
@@ -131,6 +131,7 @@ void sync_transmitter(void){
         transmit(TRANSMISSIONSIG);
         gpio_set_level(LED_PIN_2, LOW);
     } while(gpio_get_level(SIGNAL_INPUT_1) == LOW);
+    vTaskDelay(pdMS_TO_TICKS(7 * CLOCKTIME));
 }
 
 int readBetter() {
@@ -181,13 +182,13 @@ void sync_find(void) {
     while(gpio_get_level(SIGNAL_INPUT_1) == HIGH){
         // pet watchdog
         esp_task_wdt_reset();
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(CLOCKTIME));
 
     }
     while(gpio_get_level(SIGNAL_INPUT_1) == LOW){
         // pet watchdog
         esp_task_wdt_reset();
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(CLOCKTIME));
 
     }
 

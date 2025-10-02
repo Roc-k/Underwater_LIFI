@@ -19,7 +19,7 @@
 #define LED_PIN_3 12
 
 #define BUTTON_PIN_1 16
-#define BUTTON_PIN_2 17
+#define BUTTON_PIN_2 46
 #define SIGNAL_INPUT_1 40
 #define SIGNAL_OUTPUT_1 41
 
