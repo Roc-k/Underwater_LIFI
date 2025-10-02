@@ -131,7 +131,7 @@ void sync_transmitter(void){
         transmit(TRANSMISSIONSIG);
         gpio_set_level(LED_PIN_2, LOW);
     } while(gpio_get_level(SIGNAL_INPUT_1) == LOW);
-    vTaskDelay(pdMS_TO_TICKS(7 * CLOCKTIME));
+    // vTaskDelay(pdMS_TO_TICKS(CLOCKTIME));
 }
 
 int readBetter() {
